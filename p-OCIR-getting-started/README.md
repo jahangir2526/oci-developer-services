@@ -26,19 +26,23 @@
 
 3. Note down Info
 
-   1. <TenancyNamespace>
+   1. Tenancy Namespace: <TenancyNamespace>
    
-   2. <Username>
+   2. OCI Username: <Username>
    
-   3. <RegionKey> 
+   3. Region Key: <RegionKey> 
    
       https://docs.oracle.com/en-us/iaas/Content/General/Concepts/regions.htm
    
-   4. <AuthToken>
+   4. Auth Token: <AuthToken>
+   
+      
    
    5. OCIR Region Endpoint: <RegionKey>.ocir.io
    
-   6. Docker Login Username: <TenancyNamespace>/<Username> Password: <AuthToken>
+   6. OCI Repo Name: <OCIR-Repo>
+   
+   7. Docker Login Username: <TenancyNamespace>/<Username> Password: <AuthToken>
    
    
 
@@ -51,13 +55,7 @@
    $ git clone https://github.com/jahangir2526/oci-developer-services.git
    ```
 
-2. OCI Console: Create a OCIR Repo
-
-   <OCIR-Repo> **project01/my-repo-01**
-
-   Region:  **Singapore**
-
-   Compartment **Practice** 
+2. OCI Console: Create a OCIR Repo (select the desire region and compartment)
 
    A. Developer Machine: Create a docker image
 
@@ -67,10 +65,13 @@
    $ docker run -d -p 8080:80 nginx-web-server:v1
    $ curl localhost:8080
    
+   # in case you are trying to connect from outside the host, make sure to add firewall-cmd rule as follows
+   sudo firewall-cmd --permanent --add-port=8080/tcp
+   sudo firewall-cmd --reload
    ```
-
+   
    B. Push Docker image to OCIR
-
+   
    ```bash
    ## If all good
    $ docker login <RegionKey>.ocir.io 
@@ -82,9 +83,9 @@
    
    ## Check if the image upload to OCIR
    ```
-
+   
    C. Pull Image from OCIR
-
+   
    ```bash
    ## You may remove the local image
    $ docker rmi <RegionKey>.ocir.io/<TenancyNamespace>/<OCIR-Repo>:v1
@@ -95,7 +96,7 @@
    
    $ docker pull <RegionKey>.ocir.io/<TenancyNamespace>/<OCIR-Repo>:v1
    ```
-
+   
    
 
 ## File Descriptions
