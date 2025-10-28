@@ -1,26 +1,22 @@
-# Container Registry - Getting Started
+# OKE - Getting Started
 
 
 
 ## Objectives
 
-1. Create a private OCIR Repo using OCI Console
-2. Create a docker image in a developer machine, push image to OCI OCIR Repo then pull the image from OCIR Repo. Test the deployment.
+1. Create OKE Cluster (Managed Node)
 
+2. Access Cluster via "Cloud Shell Access" and "Local Access"
 
+3. Deploy a Docker image from OCIR Private Repo
+
+   
 
 ## Prerequisites:
 
-1. Prepare a Developer Machine
+1. Follow https://github.com/jahangir2526/oci-developer-services/tree/main/p-OCIR-getting-started and complete all tasks. At this point you have docker image in the container Registry.
 
-   1. Provision OCI Compute (Oracle Linux 9)
-
-   ```bash
-   $ sudo dnf install docker git -y
-   $ sudo touch /etc/containers/nodocker
-   $ docker run hello-world
-   $ docker ps
-   ```
+   
 
 2. Generate/reuse auth token
 
@@ -32,8 +28,13 @@
    OCI Username: <Username>
    Region Key: <RegionKey> 
    https://docs.oracle.com/en-us/iaas/Content/General/Concepts/regions.htm
+   
    Auth Token: <AuthToken>
-   OCI Repo Name: <OCIR-Repo>
+   
+   OCI Repo Name: <OCIRRepo>
+   
+   Docker Secret Name: <DockerSecretName> # docker secret to pull private docker image from OCIR
+   Docker Email: <DockerEmail>
    
    # Generated
    OCIR Region Endpoint: <RegionKey>.ocir.io
@@ -45,14 +46,39 @@
 
 ## Step-by-Step Instructions
 
-1. Clone the github repo 
+1. Create an OKE cluster
+
+2. Access Cluster  via "Cloud Shell Access"
+
+   1. OKE Cluster -> Action -> Access Cluster
+   2. Select "Cloud Shell Access"
+   3. Launch Cloud Shell
+   4. Copy and run the access command generated
+   5. **Note: May need to change the Cloud Shell Network to Public**
+   6. Check using command
 
    ```bash
-   $ cd ~
-   $ git clone https://github.com/jahangir2526/oci-developer-services.git
+   $ kubectl get nodes
    ```
 
-2. OCI Console: Create a OCIR Repo (select the desire region and compartment)
+3. Acess Cluster  via "Local Access"
+
+   1. Follow the onscreen instruction
+   2. Check using command
+
+   ```bash
+   $ kubectl get nodes
+   ```
+
+4. Create a docker secret
+
+   ```bash
+   $ kubectl create secret docker-registry <DockerSecretName> --docker-server=<RegionKey>.ocir.io --docker-username='<TenancyNamespace>/<Username>' --docker-password='<AuthToken>' --docker-email='<DockerEmail>'
+   ```
+
+5. 
+
+6. OCI Console: Create a OCIR Repo (select the desire region and compartment)
 
    A. Developer Machine: Create a docker image
 
@@ -66,9 +92,9 @@
    sudo firewall-cmd --permanent --add-port=8080/tcp
    sudo firewall-cmd --reload
    ```
-   
+
    B. Push Docker image to OCIR
-   
+
    ```bash
    ## If all good
    $ docker login <RegionKey>.ocir.io 
@@ -80,9 +106,9 @@
    
    ## Check if the image upload to OCIR
    ```
-   
+
    C. Pull Docker Image from OCIR
-   
+
    ```bash
    ## You may remove the local image
    $ docker rmi <RegionKey>.ocir.io/<TenancyNamespace>/<OCIR-Repo>:v1
@@ -93,7 +119,7 @@
    
    $ docker pull <RegionKey>.ocir.io/<TenancyNamespace>/<OCIR-Repo>:v1
    ```
-   
+
    
 
 ## File Descriptions
