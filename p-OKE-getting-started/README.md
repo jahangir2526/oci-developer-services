@@ -10,13 +10,13 @@
 
 3. Deploy a Docker image from OCIR Private Repo
 
+4. Test by accessing the web server deployed behind a LB
+
    
 
 ## Prerequisites:
 
 1. Follow https://github.com/jahangir2526/oci-developer-services/tree/main/p-OCIR-getting-started and complete all tasks. At this point you have docker image in the container Registry.
-
-   
 
 2. Generate/reuse auth token
 
@@ -31,9 +31,10 @@
    
    Auth Token: <AuthToken>
    
-   OCI Repo Name: <OCIRRepo>
+   OCIR Repo Name: <OCIRRepo>
+   OCIR Repo Tag/Version: <OCIRepoTag>
    
-   Docker Secret Name: <DockerSecretName> # docker secret to pull private docker image from OCIR
+   Docker Secret Name: <DockerSecretName> # to pull private docker image from OCIR
    Docker Email: <DockerEmail>
    
    # Generated
@@ -76,57 +77,64 @@
    $ kubectl create secret docker-registry <DockerSecretName> --docker-server=<RegionKey>.ocir.io --docker-username='<TenancyNamespace>/<Username>' --docker-password='<AuthToken>' --docker-email='<DockerEmail>'
    ```
 
-5. 
+5. Create the deployment and Service (LB) 
 
-6. OCI Console: Create a OCIR Repo (select the desire region and compartment)
-
-   A. Developer Machine: Create a docker image
-
-   ```bash
-   $ cd ~/oci-developer-services/p-OCIR-getting-started/
-   $ docker build -t nginx-web-server:v1 .
-   $ docker run -d -p 8080:80 nginx-web-server:v1
-   $ curl localhost:8080
+   ```yaml
+   # 1. Create a file (eg: oke-deploy-nginx.yaml) 
+   # 2. update the "image" and "imagePullSecrets: -name"
    
-   # in case you are trying to connect from outside the host, make sure to add firewall-cmd rule as follows
-   sudo firewall-cmd --permanent --add-port=8080/tcp
-   sudo firewall-cmd --reload
+   ---
+   apiVersion: apps/v1
+   kind: Deployment
+   metadata:
+     name: nginx-web-app-deploy
+     labels:
+       app: nginx-web-app
+       builder: jahangir
+   spec:
+     replicas: 3
+     selector:
+       matchLabels:
+         app: nginx-web-app
+         builder: jahangir
+     template:
+       metadata:
+         labels:
+           app: nginx-web-app
+           builder: jahangir
+       spec:
+         containers:
+         - name: nginx-web-app
+           image: <RegionKey>.ocir.io/<TenancyNamespace>/<OCIRRepo>:<OCIRRepoTag>
+           ports:
+           - containerPort: 80
+         imagePullSecrets:
+           - name: <DockerSecretName>
+   ---
+   apiVersion: v1
+   kind: Service
+   metadata:
+     name: nginx-web-app-service
+     labels:
+       app: nginx-web-app
+   spec:
+     type: LoadBalancer
+     ports:
+     - port: 80
+       targetPort: 80
+       #nodePort: 32001
+       #name: nginx-web-app-port
+     selector:
+       app: nginx-web-app
+       builder: jahangir
+   
    ```
 
-   B. Push Docker image to OCIR
+6. Create the k8s objects
 
    ```bash
-   ## If all good
-   $ docker login <RegionKey>.ocir.io 
-   # Login Username: <TenancyNamespace>/<Username>
-   # password: <AuthToken>
-   
-   $ docker tag localhost/nginx-web-server:v1 <RegionKey>.ocir.io/<TenancyNamespace>/<OCIR-Repo>:v1
-   $ docker push <RegionKey>.ocir.io/<TenancyNamespace>/<OCIR-Repo>:v1
-   
-   ## Check if the image upload to OCIR
+   $ kubectl create -f oke-deploy-nginx.yaml
+   $ kubectl get pod,deploy,svc
    ```
 
-   C. Pull Docker Image from OCIR
-
-   ```bash
-   ## You may remove the local image
-   $ docker rmi <RegionKey>.ocir.io/<TenancyNamespace>/<OCIR-Repo>:v1
-   
-   $ docker login <RegionKey>.ocir.io 
-   # Login Username: <TenancyNamespace>/<Username>
-   # password: <AuthToken>
-   
-   $ docker pull <RegionKey>.ocir.io/<TenancyNamespace>/<OCIR-Repo>:v1
-   ```
-
-   
-
-## File Descriptions
-
-| File Name                      | Description                                                  |
-| ------------------------------ | ------------------------------------------------------------ |
-| **Dockerfile & entrypoint.sh** | These two files are used to build the docker image. The entrypoint.sh generates index.html at /usr/share/nginx/html/ |
-
-
-
+7. note public ip & access the nginx web server 
