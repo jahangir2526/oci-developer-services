@@ -26,6 +26,9 @@ cat <<EOF > $nginx_index_file
   <h2>This Homepage created at: ${v_current_date} </h2><hr>
   <h2>Server Public IP: ${v_public_ip} </h2><hr>
   <h2>Server Private IP: ${v_private_ip} </h2><hr>
+  <h2>Current Time: <span id="time"></span></h2><hr>
+  <script>document.getElementById("time").textContent = new Date().toLocaleString();</script>
+
 </body>
 </html>
 EOF
