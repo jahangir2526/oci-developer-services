@@ -26,25 +26,22 @@
 
 3. Note down Info
 
-   1. Tenancy Namespace: <TenancyNamespace>
+   ```null
+   # To be captured
+   Tenancy Namespace: <TenancyNamespace>
+   OCI Username: <Username>
+   Region Key: <RegionKey> 
+   https://docs.oracle.com/en-us/iaas/Content/General/Concepts/regions.htm
+   Auth Token: <AuthToken>
+   OCI Repo Name: <OCIR-Repo>
    
-   2. OCI Username: <Username>
-   
-   3. Region Key: <RegionKey> 
-   
-      https://docs.oracle.com/en-us/iaas/Content/General/Concepts/regions.htm
-   
-   4. Auth Token: <AuthToken>
-   
-      
-   
-   5. OCIR Region Endpoint: <RegionKey>.ocir.io
-   
-   6. OCI Repo Name: <OCIR-Repo>
-   
-   7. Docker Login Username: <TenancyNamespace>/<Username> Password: <AuthToken>
-   
-   
+   # Generated
+   OCIR Region Endpoint: <RegionKey>.ocir.io
+   Docker Login Username: <TenancyNamespace>/<Username> 
+   Docker Login Password: <AuthToken>
+   ```
+
+
 
 ## Step-by-Step Instructions
 
